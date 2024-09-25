@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Launchpad</title>
+    <title>Secure Launchpad</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
-        <h1>Crypto Launchpad</h1>
+        <h1>Secure Crypto Launchpad</h1>
+        
+        <div id="notification"></div>
         
         <div id="create-sale">
             <h2>Create Token Sale</h2>
@@ -18,7 +20,7 @@
             <input type="text" id="vesting-schedule" placeholder="Vesting Schedule (comma-separated seconds)" />
             <input type="number" id="max-investment" placeholder="Max Investment Per User" />
             <input type="text" id="whitelisted-investors" placeholder="Whitelisted Investors (comma-separated addresses)" />
-            <button onclick="createSale()">Create Sale</button>
+            <button id="create-sale-button">Create Sale</button>
         </div>
 
         <div id="sales-list">
