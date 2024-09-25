@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launchpad</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Crypto Launchpad</h1>
+        
+        <div id="create-sale">
+            <h2>Create Token Sale</h2>
+            <input type="number" id="token-balance" placeholder="Token Balance" />
+            <input type="number" id="price-per-token" placeholder="Price Per Token" />
+            <input type="number" id="sale-duration" placeholder="Sale Duration (seconds)" />
+            <input type="text" id="vesting-schedule" placeholder="Vesting Schedule (comma-separated seconds)" />
+            <input type="number" id="max-investment" placeholder="Max Investment Per User" />
+            <input type="text" id="whitelisted-investors" placeholder="Whitelisted Investors (comma-separated addresses)" />
+            <button onclick="createSale()">Create Sale</button>
+        </div>
+
+        <div id="sales-list">
+            <h2>Available Sales</h2>
+            <div id="sales"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
