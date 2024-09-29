@@ -1,71 +1,95 @@
-// ... (Assume you have functions to interact with your smart contracts)
+// Assume you've included the necessary Aptos SDK or library
 
-// Fetch and display projects on page load
-window.onload = fetchProjects();
-
-async function fetchProjects() {
+async function getProjectsFromBlockchain() {
   try {
-    const projects = await getProjectsFromBlockchain(); // Replace with your actual data fetching logic
-    displayProjects(projects);
+    // Use Aptos SDK/library to interact with your smart contract
+    const projects = await aptosClient.getAccountResources(contractAddress); 
+
+    // Filter for resources of type `Launchpad::Data::Project`
+    const projectResources = projects.filter(resource => 
+        resource.type === `${contractAddress}::Launchpad::Data::Project`
+    );
+
+    // Process the returned data and format it as needed
+    const formattedProjects = projectResources.map(resource => ({
+        address: resource.address,
+        name: resource.data.name,
+        description: resource.data.description,
+        // ... other project details extracted from resource.data
+    }));
+
+    return formattedProjects;
   } catch (error) {
     displayError("Error fetching projects: " + error.message);
   }
 }
 
-function displayProjects(projects) {
-  const projectGrid = document.getElementById('project-grid');
-  projectGrid.innerHTML = ''; // Clear previous projects
-
-  projects.forEach(project => {
-    const projectCard = `
-      <div class="project-card" onclick="viewSaleDetails('${project.address}')"> 
-        <h4>${project.name}</h4>
-        <p>${project.description}</p>
-      </div>
-    `;
-    projectGrid.innerHTML += projectCard;
-  });
-}
-
-async function viewSaleDetails(saleAddress) {
+async function getSaleDetails(saleAddress) {
   try {
-    const saleDetails = await getSaleDetails(saleAddress); // Fetch sale details
-    displaySaleDetails(saleDetails);
+    // Use Aptos SDK/library to fetch the resource at the saleAddress
+    const saleResource = await aptosClient.getAccountResource(saleAddress, `${contractAddress}::Launchpad::Data::TokenSale`); 
 
-    // ... (Show/hide sections, potentially enable/disable buttons based on sale status)
+    // Process and format the returned data
+    const formattedSaleDetails = {
+        projectName: saleResource.data.project_name, // Adjust field names as needed
+        tokenPrice: saleResource.data.token_price,
+        startTime: saleResource.data.start_time,
+        endTime: saleResource.data.end_time,
+        // ... other sale details
+    };
+
+    return formattedSaleDetails;
   } catch (error) {
     displayError("Error fetching sale details: " + error.message);
   }
 }
 
-function displaySaleDetails(saleDetails) {
-  const saleInfo = document.getElementById('sale-info');
-  // ... (Populate saleInfo with details like project name, token price, etc.)
-
-  // ... (Show/hide user input and claim button based on sale status)
-}
-
-async function participateInSale() {
+async function participate(saleAddress, amount) {
   try {
-    const amount = document.getElementById('amount').value;
-    await participate(saleAddress, amount); // Call your smart contract function
-    // ... (Update UI to reflect participation, e.g., show success message)
+    // ... (Get user's Aptos account and signer)
+
+    // Build the transaction payload
+    const payload = {
+        type: "entry_function_payload",
+        function: `${contractAddress}::Launchpad::TokenSaleManager::participate_in_sale`,
+        type_arguments: [],
+        arguments: [saleAddress, amount]
+    };
+
+    // Submit the transaction
+    const txnRequest = await aptosClient.generateTransaction(senderAddress, payload);
+    const signedTxn = await aptosClient.signTransaction(signer, txnRequest);
+    const transactionRes = await aptosClient.submitTransaction(signedTxn);
+    await aptosClient.waitForTransaction(transactionRes.hash);   
+
+
+    // ... (Update UI to reflect the participation)
   } catch (error) {
     displayError("Error participating in sale: " + error.message);
   }
 }
 
-async function claimTokens() {
+async function claim(saleAddress) {
   try {
-    await claim(saleAddress); // Call your smart contract function
-    // ... (Update UI to reflect claimed tokens)
+    // ... (Get user's Aptos account and signer)
+
+    // Build the transaction payload
+    const payload = {
+        type: "entry_function_payload",
+        function: `${contractAddress}::Launchpad::TokenSaleManager::claim_tokens`,
+        type_arguments: [],
+        arguments: [saleAddress]
+    };
+
+    // Submit the transaction
+    const txnRequest = await aptosClient.generateTransaction(senderAddress, payload);
+    const signedTxn = await aptosClient.signTransaction(signer, txnRequest);
+    const transactionRes = await aptosClient.submitTransaction(signedTxn);
+    await aptosClient.waitForTransaction(transactionRes.hash);   
+
+
+    // ... (Update UI to reflect the claimed tokens)
   } catch (error) {
     displayError("Error claiming tokens: " + error.message);
   }
-}
-
-function displayError(message) {
-  const errorDiv = document.getElementById('error-message');
-  errorDiv.textContent = message;
-  errorDiv.style.display = 'block';
 }
